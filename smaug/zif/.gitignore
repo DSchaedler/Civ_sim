@@ -1,0 +1,9 @@
+.DS_Store
+tmp/*
+logs/*
+exceptions/*
+console_history.txt
+.dragonruby/*
+.yardoc/*
+app/server_ip_address.txt
+metadata/game_metadata.txt
