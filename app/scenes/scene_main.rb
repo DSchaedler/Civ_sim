@@ -19,11 +19,10 @@ module Civ
           { x: x * GRID_SIZE, y: y * GRID_SIZE }.merge(grass.sample)
         end
       end
-      # $game.draw.static_draw << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :field }
-      $game.draw.static_draw << { x: 500, y: 400, text: 'Hello from SceneMain', primitive_marker: :label }
+      $game.draw.static_layer << { x: 500, y: 400, text: 'Hello from SceneMain', primitive_marker: :label }
 
       NineTile.nine_tile(args, w: 300, h: 300, source_x: 11 * 128, source_y: 11 * 128, source_w: 384, path: 'app/sprites/RPGpack_sheet_2X.png', symbol: :lake)
-      $game.draw.static_draw << { x: 300, y: 300, w: 384, h: 384, path: :lake }
+      $game.draw.static_layer << { x: 300, y: 300, w: 384, h: 384, path: :lake }
     end
 
     def tick(args)

@@ -13,7 +13,7 @@ module Civ
     end
 
     def once(_args)
-      $game.draw.static_draw << { x: 500, y: 500, text: 'Hello from Scene Manager', primitive_marker: :label }
+      @once_done = true
     end
 
     def tick(args)
