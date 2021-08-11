@@ -12,14 +12,14 @@ module Civ
     end
 
     def tick(args)
+      if @static_draw != @current_static
+        @current_static = @static_draw
+        args.outputs.static_primitives.clear
+        args.outputs.static_primitives << @current_static
+      end
+      
       args.outputs.primitives << @draw if @draw
       @draw = []
-
-      return unless @static_draw != @current_static
-
-      @current_static = @static_draw
-      args.outputs.static_primitives.clear
-      args.outputs.static_primitives << @current_static
     end
   end
 end
