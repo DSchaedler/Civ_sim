@@ -1,0 +1,1 @@
+Changed static at game tick 0

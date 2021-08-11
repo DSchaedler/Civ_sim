@@ -13,7 +13,6 @@ version = "2.23"
 edition = "standard"
 
 [dependencies]
-zif = "2.0.0-rc.2"
 
 [itch]
 # The Project URL you set when you created the game on Itch.io. https://my-username.itch.io/my-game.
