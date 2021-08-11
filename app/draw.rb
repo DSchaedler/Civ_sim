@@ -1,7 +1,5 @@
 module Civ
   # Abstracted drawing handler.
-  # Add primitives to $game.draw.draw or $game.draw.static_draw
-  # e.g. $game.draw.static_draw << [100, 100, "Hello World"].label
   class Draw
     attr_accessor :layers, :static_layer
 
@@ -22,9 +20,7 @@ module Civ
         @current_static = @static_layer
 
         args.outputs.static_primitives.clear
-        @current_static.each do |layer|
-          args.outputs.static_primitives << layer
-        end
+        args.outputs.static_primitives << @current_static
       end
 
     end
