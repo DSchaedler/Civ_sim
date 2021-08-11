@@ -15,14 +15,13 @@ module Civ
         args.outputs.primitives << layer
       end
       @layers.clear
-      
+
       if @static_layer != @current_static
         @current_static = @static_layer
 
         args.outputs.static_primitives.clear
         args.outputs.static_primitives << @current_static
       end
-
     end
   end
 end

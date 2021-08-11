@@ -64,7 +64,20 @@ module Civ
         end
       end
 
+      tile_hover(args)
+
       debug(args)
+    end
+
+    def tile_hover(args)
+      tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
+      tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
+      $game.draw.layers[1] << { x: tile_x * GRID_SIZE,
+                                y: tile_y * GRID_SIZE,
+                                w: GRID_SIZE,
+                                h: GRID_SIZE,
+                                path: 'app/sprites/selectionCursor.png',
+                                primitive_marker: :sprite }
     end
 
     def debug_once(args)
@@ -82,6 +95,7 @@ module Civ
     def debug(args)
       return unless $game.do_debug
       args.outputs.debug << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :scene_main_debug }
+      args.outputs.debug << { x: 0, y: 80, text: "Tile #{(args.inputs.mouse.x / GRID_SIZE).floor}, #{(args.inputs.mouse.y / GRID_SIZE).floor}", primitive_marker: :label }
     end
   end
 end
