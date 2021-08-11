@@ -1,3 +1,0 @@
--> puts $game.draw.layers
-
-=> nil
