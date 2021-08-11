@@ -3,10 +3,11 @@ module Civ
   # Add primitives to $game.draw.draw or $game.draw.static_draw
   # e.g. $game.draw.static_draw << [100, 100, "Hello World"].label
   class Draw
-    attr_accessor :draw, :static_draw
+    attr_accessor :layers, :static_draw
 
     def initialize(_args)
-      @draw = []
+      # layers = [[{}, {}, {},], [{}, {}, {}]]
+      @layers = []
       @static_draw = []
       @current_static = []
     end
@@ -17,9 +18,11 @@ module Civ
         args.outputs.static_primitives.clear
         args.outputs.static_primitives << @current_static
       end
-      
-      args.outputs.primitives << @draw if @draw
-      @draw = []
+
+      @layers.each do |layer|
+        args.outputs.primitives << layer
+      end
+      @layers.clear
     end
   end
 end
