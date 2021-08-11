@@ -5,7 +5,7 @@ module Civ
   class Draw
     attr_accessor :draw, :static_draw
 
-    def initialize
+    def initialize(_args)
       @draw = []
       @static_draw = []
       @current_static = []
