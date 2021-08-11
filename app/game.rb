@@ -7,7 +7,7 @@ module Civ
     def initialize(args)
       @do_debug = false
       @game_tick = 0
-      @scene_manager = Civ::Scene_Manager.new(args)
+      @scene_manager = Civ::SceneManager.new(args)
       @draw = Civ::Draw.new
     end
 
