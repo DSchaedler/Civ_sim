@@ -13,7 +13,8 @@ BASE_SPRITE = {
   h: GRID_SIZE,
   path: 'app/sprites/roguelikeCity_transparent.png',
   source_w: SPRITE_WIDTH,
-  source_h: SPRITE_HEIGHT
+  source_h: SPRITE_HEIGHT,
+  primitive_marker: :sprite
 }.freeze
 
 SPRITE_GRASS_A = {
@@ -30,3 +31,12 @@ SPRITE_GRASS_C = {
   source_x: 1 * (SPRITE_WIDTH + MARGIN),
   source_y: 3 * (SPRITE_HEIGHT + MARGIN)
 }.merge(BASE_SPRITE)
+
+GRASS_SPRITES = [SPRITE_GRASS_A, SPRITE_GRASS_B, SPRITE_GRASS_C]
+
+SPRITE_CURSOR = {
+  w: GRID_SIZE,
+  h: GRID_SIZE,
+  path: 'app/sprites/selectionCursor.png',
+  primitive_marker: :sprite
+}

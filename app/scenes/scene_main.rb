@@ -99,11 +99,7 @@ module Civ
       $game.draw.layers[3] << {
         x: tile_x * GRID_SIZE,
         y: tile_y * GRID_SIZE,
-        w: GRID_SIZE,
-        h: GRID_SIZE,
-        path: 'app/sprites/selectionCursor.png',
-        primitive_marker: :sprite
-      }
+      }.merge(SPRITE_CURSOR)
     end
 
     def debug_once(args)
