@@ -29,7 +29,7 @@ module Civ
       debug_prims << { x: 0, y: 40, text: "Scene Tick: #{@scene_manager.scene_tick}", primitive_marker: :label }
       debug_prims << { x: 0, y: 60, text: "Scene:      #{@scene_manager.curr_scene.name}", primitive_marker: :label }
 
-      args.outputs.debug << debug_prims
+      $game.draw.debug_layer << debug_prims
     end
   end
 end
