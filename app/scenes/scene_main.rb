@@ -14,8 +14,10 @@ module Civ
       debug_once(args)
 
       grass = [SPRITE_GRASS_A, SPRITE_GRASS_B, SPRITE_GRASS_C]
-      args.render_target(:field).sprites << SCREEN_WIDTH.map_with_index do |x|
-        SCREEN_HEIGHT.map_with_index do |y|
+      tiles_x = args.grid.w / GRID_SIZE
+      tiles_y = args.grid.h / GRID_SIZE
+      args.render_target(:field).sprites << tiles_x.map_with_index do |x|
+        tiles_y.map_with_index do |y|
           { x: x * GRID_SIZE, y: y * GRID_SIZE }.merge(grass.sample)
         end
       end
@@ -54,15 +56,6 @@ module Civ
       args.state.x -= 1 if args.inputs.keyboard.key_up.left
       args.state.y += 1 if args.inputs.keyboard.key_up.up
       args.state.y -= 1 if args.inputs.keyboard.key_up.down
-
-      if (args.state.tick_count % 180).zero?
-        args.state.x += 1
-        if args.state.x > 40
-          args.state.y += 1
-          args.state.x = 0
-          args.state.y = 0 if args.state.y > 30
-        end
-      end
 
       tile_hover(args)
 
