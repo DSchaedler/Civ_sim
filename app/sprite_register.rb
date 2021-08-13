@@ -32,11 +32,11 @@ SPRITE_GRASS_C = {
   source_y: 3 * (SPRITE_HEIGHT + MARGIN)
 }.merge(BASE_SPRITE)
 
-GRASS_SPRITES = [SPRITE_GRASS_A, SPRITE_GRASS_B, SPRITE_GRASS_C]
+GRASS_SPRITES = [SPRITE_GRASS_A, SPRITE_GRASS_B, SPRITE_GRASS_C].freeze
 
 SPRITE_CURSOR = {
   w: GRID_SIZE,
   h: GRID_SIZE,
   path: 'app/sprites/selectionCursor.png',
   primitive_marker: :sprite
-}
+}.freeze

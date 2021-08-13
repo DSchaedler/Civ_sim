@@ -25,7 +25,7 @@ module Civ
 
     def tick(args)
       once(args) unless @once_done
-      
+
       $game.draw.layers[0] ||= [] # Background Layer
       $game.draw.layers[1] ||= [] # Modified Tiles
       $game.draw.layers[2] ||= [] # Active Layer
@@ -63,7 +63,8 @@ module Civ
       if args.inputs.mouse.button_left
         tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
         tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-        args.state.layer2 << {
+        args.state.layer2[tile_x] ||= []
+        args.state.layer2[tile_x][tile_y] = {
           x: tile_x * GRID_SIZE,
           y: tile_y * GRID_SIZE,
           w: GRID_SIZE,
@@ -75,13 +76,18 @@ module Civ
           source_h: SPRITE_HEIGHT,
           primitve_marker: :sprite
         }
+        args.render_target(:new_tiles).sprites.clear
+        args.state.layer2.each { |row|
+          if row
+            row.each {|tile|
+              args.render_target(:new_tiles).sprites << tile if tile
+          }
+          end
+        }
+
       end
 
-      args.render_target(:new_tiles).sprites << args.state.layer2
-
-      if args.state.layer2 != []
-        $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite }
-      end
+      $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite } if args.state.layer2 != []
 
       debug(args)
     end
@@ -91,7 +97,7 @@ module Civ
       tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
       $game.draw.layers[3] << {
         x: tile_x * GRID_SIZE,
-        y: tile_y * GRID_SIZE,
+        y: tile_y * GRID_SIZE
       }.merge(SPRITE_CURSOR)
     end
 
