@@ -3,8 +3,8 @@
 
 devid=todo-change-me
 devtitle=TODO: My Name &lt;todo@example.com&gt;
-gameid=civ_sim
-gametitle=civ_sim
+gameid=Civ_sim
+gametitle=Civ_sim
 version=0.1.0
 icon=metadata/icon.png
 compile_ruby=false

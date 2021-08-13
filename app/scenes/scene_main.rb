@@ -60,9 +60,9 @@ module Civ
       tile_hover(args)
 
       args.state.layer2 ||= []
-      if args.inputs.mouse.up
-        tile_x = (args.inputs.mouse.up.x / GRID_SIZE).floor
-        tile_y = (args.inputs.mouse.up.y / GRID_SIZE).floor
+      if args.inputs.mouse.button_left
+        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
+        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
         args.state.layer2 << {
           x: tile_x * GRID_SIZE,
           y: tile_y * GRID_SIZE,
