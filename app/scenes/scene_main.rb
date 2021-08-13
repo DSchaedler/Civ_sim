@@ -59,34 +59,6 @@ module Civ
 
       tile_hover(args)
 
-      args.state.layer2 ||= []
-      if args.inputs.mouse.button_left
-        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
-        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-        args.state.layer2[tile_x] ||= []
-        args.state.layer2[tile_x][tile_y] = {
-          x: tile_x * GRID_SIZE,
-          y: tile_y * GRID_SIZE,
-          w: GRID_SIZE,
-          h: GRID_SIZE,
-          path: 'app/sprites/roguelikeCity_transparent.png',
-          source_x: args.state.x * (SPRITE_WIDTH + MARGIN),
-          source_y: args.state.y * (SPRITE_HEIGHT + MARGIN),
-          source_w: SPRITE_WIDTH,
-          source_h: SPRITE_HEIGHT,
-          primitve_marker: :sprite
-        }
-        args.render_target(:new_tiles).sprites.clear
-        args.state.layer2.each { |row|
-          if row
-            row.each {|tile|
-              args.render_target(:new_tiles).sprites << tile if tile
-          }
-          end
-        }
-
-      end
-
       $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite } if args.state.layer2 != []
 
       debug(args)
@@ -99,6 +71,54 @@ module Civ
         x: tile_x * GRID_SIZE,
         y: tile_y * GRID_SIZE
       }.merge(SPRITE_CURSOR)
+
+      tile_click(args)
+    end
+
+    def tile_click(args)
+      args.state.layer2 ||= []
+      if args.inputs.mouse.button_left
+        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
+        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
+        args.state.layer2[tile_x] ||= []
+        new_tile = {
+          x: tile_x * GRID_SIZE,
+          y: tile_y * GRID_SIZE,
+          w: GRID_SIZE,
+          h: GRID_SIZE,
+          path: 'app/sprites/roguelikeCity_transparent.png',
+          source_x: args.state.x * (SPRITE_WIDTH + MARGIN),
+          source_y: args.state.y * (SPRITE_HEIGHT + MARGIN),
+          source_w: SPRITE_WIDTH,
+          source_h: SPRITE_HEIGHT,
+          primitve_marker: :sprite
+        }
+        if new_tile != args.state.layer2[tile_x][tile_y]
+          args.state.layer2[tile_x][tile_y] = new_tile
+          update_tiles(args)
+        end
+      end
+
+      if args.inputs.mouse.button_right
+        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
+        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
+        args.state.layer2[tile_x] ||= []
+        if args.state.layer2[tile_x][tile_y]
+          args.state.layer2[tile_x][tile_y] = nil
+          update_tiles(args)
+        end
+      end
+
+    end
+
+    def update_tiles(args)
+      args.state.render_target(:new_tiles).sprites.clear if args.state.render_target(:new_tiles)
+      args.state.layer2.each do |row|
+        next unless row
+        row.each do |tile|
+          args.render_target(:new_tiles).sprites << tile
+        end
+      end
     end
 
     def debug_once(args)
