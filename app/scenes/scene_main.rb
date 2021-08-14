@@ -7,50 +7,43 @@ module Civ
     def initialize
       @name = 'Main'
       @once_done = false
+      @tile_x = 0
+      @tile_y = 0
+      @new_tiles = false
     end
 
     def once(args)
-      @once_done = true
       debug_once(args)
 
-      grass = [SPRITE_GRASS_A, SPRITE_GRASS_B, SPRITE_GRASS_C]
-      tiles_x = args.grid.w / GRID_SIZE
-      tiles_y = args.grid.h / GRID_SIZE
-      args.render_target(:field).sprites << tiles_x.map_with_index do |x|
-        tiles_y.map_with_index do |y|
-          { x: x * GRID_SIZE, y: y * GRID_SIZE }.merge(grass.sample)
+      args.render_target(:field).sprites << SCREEN_WIDTH.map_with_index do |x|
+        SCREEN_HEIGHT.map_with_index do |y|
+          { x: x * GRID_SIZE, y: y * GRID_SIZE }.merge(GRASS_SPRITES.sample)
         end
       end
+
+      args.state.x = 0
+      args.state.y = 0
+      @once_done = true
     end
 
     def tick(args)
-      once(args) unless @once_done
+      once(args) if @once_done == false
+
+      @tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
+      @tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
 
       $game.draw.layers[0] ||= [] # Background Layer
       $game.draw.layers[1] ||= [] # Modified Tiles
       $game.draw.layers[2] ||= [] # Active Layer
       $game.draw.layers[3] ||= [] # UI Layer
 
-      args.state.x ||= 0
-      args.state.y ||= 0
-
       $game.draw.layers[0] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :field }
 
-      $game.draw.layers[2] << {
-        x: 4 * GRID_SIZE,
-        y: 4 * GRID_SIZE,
-        w: GRID_SIZE,
-        h: GRID_SIZE,
-        path: 'app/sprites/roguelikeCity_transparent.png',
-        source_x: args.state.x * (SPRITE_WIDTH + MARGIN),
-        source_y: args.state.y * (SPRITE_HEIGHT + MARGIN),
-        source_w: SPRITE_WIDTH,
-        source_h: SPRITE_HEIGHT,
-        primitve_marker: :sprite
-      }
-
       $game.draw.layers[2] << { x: 4 * GRID_SIZE, y: 4 * GRID_SIZE,
-                                text: "x: #{args.state.x} y: #{args.state.y}", primitive_marker: :label }
+                                source_x: args.state.x * (SPRITE_WIDTH + MARGIN),
+                                source_y: args.state.y * (SPRITE_HEIGHT + MARGIN) }.merge(BASE_SPRITE)
+
+      $game.draw.layers[2] << { x: 4 * GRID_SIZE, y: 4 * GRID_SIZE, text: "x: #{args.state.x} y: #{args.state.y}", primitive_marker: :label }
 
       args.state.x += 1 if args.inputs.keyboard.key_up.right
       args.state.x -= 1 if args.inputs.keyboard.key_up.left
@@ -59,56 +52,34 @@ module Civ
 
       tile_hover(args)
 
-      $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite } if args.state.layer2 != []
+      $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite } if @new_tiles
 
       debug(args)
     end
 
     def tile_hover(args)
-      tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
-      tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-      $game.draw.layers[3] << {
-        x: tile_x * GRID_SIZE,
-        y: tile_y * GRID_SIZE
-      }.merge(SPRITE_CURSOR)
+      $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }.merge(SPRITE_CURSOR)
 
-      tile_click(args)
+      args.state.layer2 ||= []
+      args.state.layer2[@tile_x] ||= []
+      left_click(args) if args.inputs.mouse.button_left
+      right_click(args) if args.inputs.mouse.button_right
     end
 
-    def tile_click(args)
-      args.state.layer2 ||= []
-      if args.inputs.mouse.button_left
-        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
-        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-        args.state.layer2[tile_x] ||= []
-        new_tile = {
-          x: tile_x * GRID_SIZE,
-          y: tile_y * GRID_SIZE,
-          w: GRID_SIZE,
-          h: GRID_SIZE,
-          path: 'app/sprites/roguelikeCity_transparent.png',
-          source_x: args.state.x * (SPRITE_WIDTH + MARGIN),
-          source_y: args.state.y * (SPRITE_HEIGHT + MARGIN),
-          source_w: SPRITE_WIDTH,
-          source_h: SPRITE_HEIGHT,
-          primitve_marker: :sprite
-        }
-        if new_tile != args.state.layer2[tile_x][tile_y]
-          args.state.layer2[tile_x][tile_y] = new_tile
-          update_tiles(args)
-        end
-      end
+    def left_click(args)
+      new_tile = { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE,
+                   source_x: args.state.x * (SPRITE_WIDTH + MARGIN), source_y: args.state.y * (SPRITE_HEIGHT + MARGIN) }.merge(BASE_SPRITE)
 
-      if args.inputs.mouse.button_right
-        tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
-        tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-        args.state.layer2[tile_x] ||= []
-        if args.state.layer2[tile_x][tile_y]
-          args.state.layer2[tile_x][tile_y] = nil
-          update_tiles(args)
-        end
-      end
+      return unless new_tile != args.state.layer2[@tile_x][@tile_y]
+      args.state.layer2[@tile_x][@tile_y] = new_tile
+      @new_tiles = true
+      update_tiles(args)
+    end
 
+    def right_click(args)
+      return unless args.state.layer2[@tile_x][@tile_y]
+      args.state.layer2[@tile_x][@tile_y] = nil
+      update_tiles(args)
     end
 
     def update_tiles(args)
@@ -135,10 +106,8 @@ module Civ
 
     def debug(args)
       return unless $game.do_debug
-      tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
-      tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
       $game.draw.debug_layer << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :scene_main_debug }
-      $game.draw.debug_layer << { x: 0, y: 80, text: "Tile #{tile_x}, #{tile_y}", primitive_marker: :label }
+      $game.draw.debug_layer << { x: 0, y: 80, text: "Tile #{@tile_x}, #{@tile_y}", primitive_marker: :label }
     end
   end
 end

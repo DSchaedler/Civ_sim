@@ -15,14 +15,13 @@ module Civ
       @scene_manager.tick(args)
       @draw.tick(args)
 
-      debug(args)
+      @do_debug = !@do_debug if args.inputs.keyboard.key_up.tab
+      debug(args) if @do_debug
+
       @game_tick += 1
     end
 
     def debug(args)
-      @do_debug = !@do_debug if args.inputs.keyboard.key_up.tab
-      return unless @do_debug
-
       debug_prims = []
       debug_prims << args.gtk.framerate_diagnostics_primitives
       debug_prims << { x: 0, y: 20, text: "Game Tick:  #{@game_tick}", primitive_marker: :label }
