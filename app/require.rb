@@ -5,4 +5,4 @@ require 'app/sprite_register.rb'
 
 require 'app/scenes/scene_main.rb'
 
-require 'app/utils/nine_tile.rb'
+# require 'app/utils/nine_tile.rb'
