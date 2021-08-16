@@ -4,5 +4,6 @@ require 'app/draw.rb'
 require 'app/sprite_register.rb'
 
 require 'app/scenes/scene_main.rb'
+require 'app/scenes/scene_main_paint.rb'
 
 # require 'app/utils/nine_tile.rb'

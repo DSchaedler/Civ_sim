@@ -5,8 +5,8 @@ MARGIN = 1
 
 GRID_SIZE = 40
 
-SCREEN_WIDTH = 1280 / GRID_SIZE
-SCREEN_HEIGHT = 720 / GRID_SIZE
+SCREEN_WIDTH = 1280 / GRID_SIZE # 32
+SCREEN_HEIGHT = 720 / GRID_SIZE # 18
 
 BASE_SPRITE = {
   w: GRID_SIZE,
@@ -38,5 +38,12 @@ SPRITE_CURSOR = {
   w: GRID_SIZE,
   h: GRID_SIZE,
   path: 'app/sprites/selectionCursor.png',
+  primitive_marker: :sprite
+}.freeze
+
+SPRITE_MOUSE_CURSOR = {
+  w: GRID_SIZE,
+  h: GRID_SIZE,
+  path: 'app/sprites/mouse_cursor.png',
   primitive_marker: :sprite
 }.freeze
