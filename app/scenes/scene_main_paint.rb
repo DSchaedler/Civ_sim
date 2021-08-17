@@ -75,6 +75,8 @@ module Civ
       @cursor_y += 1 if args.inputs.keyboard.key_up.up
       @cursor_y -= 1 if args.inputs.keyboard.key_up.down
 
+      return unless @map_tile_x >= 0
+      return unless @map_tile_y >= 0
       @main.layer2[@map_tile_x] ||= []
       left_click(args) if args.inputs.mouse.button_left
       right_click(args) if args.inputs.mouse.button_right
@@ -84,8 +86,6 @@ module Civ
       new_tile = { x: @map_tile_x * GRID_SIZE, y: @map_tile_y * GRID_SIZE,
                    source_x: @cursor_x * (SPRITE_WIDTH + MARGIN), source_y: @cursor_y * (SPRITE_HEIGHT + MARGIN) }.merge(BASE_SPRITE)
 
-      return unless @map_tile_x >= 0
-      return unless @map_tile_y >= 0
       return unless new_tile != @main.layer2[@map_tile_x][@map_tile_y]
       @main.layer2[@map_tile_x][@map_tile_y] = new_tile
       @main.new_tiles = true
@@ -93,8 +93,6 @@ module Civ
     end
 
     def right_click(args)
-      return unless @map_tile_x.between?(-1, 32)
-      return unless @map_tile_y.between?(-1, 18)
       return unless @main.layer2[@map_tile_x][@map_tile_y]
       @main.layer2[@map_tile_x][@map_tile_y] = nil
       update_tiles(args)

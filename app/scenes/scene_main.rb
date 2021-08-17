@@ -25,6 +25,8 @@ module Civ
 
       $game.scene_manager.scenes[:mainPaint] ||= SceneMainPaint.new(args)
 
+      $game.draw.layers = [[], [], [], []]
+
       @once_done = true
     end
 
@@ -39,11 +41,6 @@ module Civ
     def calc(args)
       @tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
       @tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
-
-      $game.draw.layers[0] ||= [] # Background Layer
-      $game.draw.layers[1] ||= [] # Modified Tiles
-      $game.draw.layers[2] ||= [] # Active Layer
-      $game.draw.layers[3] ||= [] # UI Layer
 
       $game.scene_manager.next_scene = $game.scene_manager.scenes[:mainPaint] if args.inputs.keyboard.key_up.p
     end

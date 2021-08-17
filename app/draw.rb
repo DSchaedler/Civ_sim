@@ -11,7 +11,7 @@ module Civ
 
     def tick(args)
       args.outputs.primitives << @layers
-      @layers.clear
+      @layers.each(&:clear)
 
       args.outputs.debug << @debug_layer
       @debug_layer.clear
