@@ -1,6 +1,8 @@
 module Civ
   # Scene for editing SceneMain
   class SceneMainPaint
+    attr_gtk
+
     TILE_OFFSET = 2
 
     SCALED_SCREEN_WIDTH = (1280 / GRID_SIZE) + TILE_OFFSET
@@ -38,8 +40,6 @@ module Civ
     end
 
     def calc(args)
-      @main.calc(args)
-
       @tile_x = (args.inputs.mouse.x / SCALED_GRID_X).floor
       @tile_y = (args.inputs.mouse.y / SCALED_GRID_Y).floor
 
@@ -48,16 +48,30 @@ module Civ
 
       paint_mode(args)
 
-      $game.scene_manager.next_scene = $game.scene_manager.scenes[:main] if args.inputs.keyboard.key_up.p
+      return unless args.inputs.keyboard.key_up.p
+
+      $game.scene_manager.next_scene = $game.scene_manager.scenes[:main]
     end
 
     def draw(args)
-      $game.draw.layers[0] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y, w: args.grid.w - OFFSET_MARGIN_X, h: args.grid.h - OFFSET_MARGIN_Y, path: :field }
-      $game.draw.layers[3] << { x: @tile_x * SCALED_GRID_X, y: @tile_y * SCALED_GRID_Y }.merge(SPRITE_CURSOR)
-      args.gtk.hide_cursor
-      $game.draw.layers[3] << { x: args.inputs.mouse.x - 8, y: args.inputs.mouse.y - 8 }.merge(SPRITE_MOUSE_CURSOR)
-      $game.draw.layers[1] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y, w: args.grid.w - OFFSET_MARGIN_X, h: args.grid.h - OFFSET_MARGIN_Y, path: :new_tiles, primitive_marker: :sprite } if @main.new_tiles
       debug(args)
+      args.gtk.hide_cursor
+
+      $game.draw.layers[0] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y,
+                                w: args.grid.w - OFFSET_MARGIN_X,
+                                h: args.grid.h - OFFSET_MARGIN_Y, path: :field }
+      $game.draw.layers[3] << { x: @tile_x * SCALED_GRID_X,
+                                y: @tile_y * SCALED_GRID_Y }
+                              .merge(SPRITE_CURSOR)
+      $game.draw.layers[3] << { x: args.inputs.mouse.x - 8,
+                                y: args.inputs.mouse.y - 8 }
+                              .merge(SPRITE_MOUSE_CURSOR)
+      return unless @main.new_tiles
+
+      $game.draw.layers[1] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y,
+                                w: args.grid.w - OFFSET_MARGIN_X,
+                                h: args.grid.h - OFFSET_MARGIN_Y,
+                                path: :new_tiles, primitive_marker: :sprite }
     end
 
     # Paint Mode
@@ -65,10 +79,15 @@ module Civ
     def paint_mode(args)
       $game.draw.layers[2] << { x: 0, y: args.grid.top - SCALED_GRID_Y,
                                 source_x: @cursor_x * (SPRITE_WIDTH + MARGIN),
-                                source_y: @cursor_y * (SPRITE_HEIGHT + MARGIN) }.merge(BASE_SPRITE)
+                                source_y: @cursor_y * (SPRITE_HEIGHT + MARGIN) }
+                              .merge(BASE_SPRITE)
 
-      $game.draw.layers[2] << { x: 0, y: args.grid.top - SCALED_GRID_X, text: "x: #{@cursor_x}", primitive_marker: :label }
-      $game.draw.layers[2] << { x: 0, y: args.grid.top - SCALED_GRID_Y - 20, text: "y: #{@cursor_y}", primitive_marker: :label }
+      $game.draw.layers[2] << { x: 0, y: args.grid.top - SCALED_GRID_X,
+                                text: "x: #{@cursor_x}",
+                                primitive_marker: :label }
+      $game.draw.layers[2] << { x: 0, y: args.grid.top - SCALED_GRID_Y - 20,
+                                text: "y: #{@cursor_y}",
+                                primitive_marker: :label }
 
       @cursor_x += 1 if args.inputs.keyboard.key_up.right
       @cursor_x -= 1 if args.inputs.keyboard.key_up.left
@@ -84,7 +103,9 @@ module Civ
 
     def left_click(args)
       new_tile = { x: @map_tile_x * GRID_SIZE, y: @map_tile_y * GRID_SIZE,
-                   source_x: @cursor_x * (SPRITE_WIDTH + MARGIN), source_y: @cursor_y * (SPRITE_HEIGHT + MARGIN) }.merge(BASE_SPRITE)
+                   source_x: @cursor_x * (SPRITE_WIDTH + MARGIN),
+                   source_y: @cursor_y * (SPRITE_HEIGHT + MARGIN) }
+                 .merge(BASE_SPRITE)
 
       return unless new_tile != @main.layer2[@map_tile_x][@map_tile_y]
       @main.layer2[@map_tile_x][@map_tile_y] = new_tile
@@ -99,11 +120,11 @@ module Civ
     end
 
     def update_tiles(args)
-      args.state.render_target(:new_tiles).sprites.clear if args.state.render_target(:new_tiles)
+      args.outputs[:new_tiles].sprites.clear if args.outputs[:new_tiles]
       @main.layer2.each do |row|
         next unless row
         row.each do |tile|
-          args.render_target(:new_tiles).sprites << tile
+          args.outputs[:new_tiles].sprites << tile
         end
       end
     end
@@ -114,18 +135,25 @@ module Civ
       debug = []
 
       (args.grid.w / GRID_SIZE).map_with_index do |x|
-        debug << { x: x * GRID_SIZE, y: 0, x2: x * GRID_SIZE, y2: args.grid.top, primitive_marker: :line }
+        debug << { x: x * GRID_SIZE, y: 0, x2: x * GRID_SIZE,
+                   y2: args.grid.top, primitive_marker: :line }
       end
       (args.grid.h / GRID_SIZE).map_with_index do |y|
-        debug << { x: 0, y: y * GRID_SIZE, x2: args.grid.right, y2: y * GRID_SIZE, primitive_marker: :line }
+        debug << { x: 0, y: y * GRID_SIZE, x2: args.grid.right,
+                   y2: y * GRID_SIZE, primitive_marker: :line }
       end
-      args.render_target(:scene_main_paint_debug).lines << debug
+      args.outputs[:scene_main_paint_debug].lines << debug
     end
 
     def debug(args)
       return unless $game.do_debug
-      $game.draw.debug_layer << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y, w: args.grid.w - OFFSET_MARGIN_X, h: args.grid.h - OFFSET_MARGIN_Y, path: :scene_main_paint_debug }
-      $game.draw.debug_layer << { x: 0, y: 80, text: "Tile #{@tile_x}, #{@tile_y}", primitive_marker: :label }
+      $game.draw.debug_layer << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y,
+                                  w: args.grid.w - OFFSET_MARGIN_X,
+                                  h: args.grid.h - OFFSET_MARGIN_Y,
+                                  path: :scene_main_paint_debug }
+      $game.draw.debug_layer << { x: 0, y: 80,
+                                  text: "Tile #{@tile_x}, #{@tile_y}",
+                                  primitive_marker: :label }
     end
   end
 end
