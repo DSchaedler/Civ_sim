@@ -1,5 +1,6 @@
 module Civ
-  # Highest level game class. main.rb initializes then directs tick and args here.
+  # Highest level game class.
+  # main.rb initializes then directs tick and args here.
   # All code and ojects should originate from Game if possible.
   class Game
     attr_accessor :do_debug, :game_tick, :scene_manager, :draw
@@ -22,13 +23,16 @@ module Civ
     end
 
     def debug(args)
-      debug_prims = []
-      debug_prims << args.gtk.framerate_diagnostics_primitives
-      debug_prims << { x: 0, y: 20, text: "Game Tick:  #{@game_tick}", primitive_marker: :label }
-      debug_prims << { x: 0, y: 40, text: "Scene Tick: #{@scene_manager.scene_tick}", primitive_marker: :label }
-      debug_prims << { x: 0, y: 60, text: "Scene:      #{@scene_manager.curr_scene.name}", primitive_marker: :label }
-
-      $game.draw.debug_layer << debug_prims
+      debug_layer = $game.draw.debug_layer
+      debug_layer << args.gtk.framerate_diagnostics_primitives
+      debug_layer << { x: 0, y: 20, text: "Game Tick:  #{@game_tick}",
+                       primitive_marker: :label }
+      debug_layer << { x: 0, y: 40, text: "Scene Tick: #{@scene_manager
+                                    .scene_tick}",
+                       primitive_marker: :label }
+      debug_layer << { x: 0, y: 60, text: "Scene:      #{@scene_manager
+                                    .curr_scene.name}",
+                       primitive_marker: :label }
     end
   end
 end

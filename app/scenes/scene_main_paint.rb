@@ -56,18 +56,27 @@ module Civ
     def draw(args)
       debug(args)
       args.gtk.hide_cursor
+      draw_field(args)
+      draw_cursor(args)
+      draw_tiles(args) if @main.new_tiles
+    end
 
+    def draw_field(args)
       $game.draw.layers[0] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y,
                                 w: args.grid.w - OFFSET_MARGIN_X,
                                 h: args.grid.h - OFFSET_MARGIN_Y, path: :field }
+    end
+
+    def draw_cursor(args)
       $game.draw.layers[3] << { x: @tile_x * SCALED_GRID_X,
                                 y: @tile_y * SCALED_GRID_Y }
                               .merge(SPRITE_CURSOR)
       $game.draw.layers[3] << { x: args.inputs.mouse.x - 8,
                                 y: args.inputs.mouse.y - 8 }
                               .merge(SPRITE_MOUSE_CURSOR)
-      return unless @main.new_tiles
+    end
 
+    def draw_tiles(args)
       $game.draw.layers[1] << { x: OFFSET_MARGIN_X, y: OFFSET_MARGIN_Y,
                                 w: args.grid.w - OFFSET_MARGIN_X,
                                 h: args.grid.h - OFFSET_MARGIN_Y,

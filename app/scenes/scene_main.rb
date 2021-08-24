@@ -12,6 +12,7 @@ module Civ
       @tile_y = 0
       @new_tiles = false
       @layer2 = []
+      @mouse = { x: $gtk.args.inputs.mouse.x, y: $gtk.args.inputs.mouse.y }
     end
 
     def once(args)
@@ -34,6 +35,11 @@ module Civ
 
     def tick(args)
       once(args) if @once_done == false
+
+      args.gtk.hide_cursor
+
+      mouse_move(args)
+
       calc(args)
       draw(args)
     end
@@ -42,38 +48,57 @@ module Civ
       @tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
       @tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
 
-      $game.scene_manager.next_scene = $game.scene_manager.scenes[:mainPaint] if args.inputs.keyboard.key_up.p
+      return unless args.inputs.keyboard.key_up.p
+
+      $game.scene_manager.next_scene = $game.scene_manager.scenes[:mainPaint]
+    end
+
+    def mouse_move(args)
+      mouse = { x: args.inputs.mouse.x, y: args.inputs.mouse.y }
+      return unless @mouse != mouse
+
+      @mouse = mouse
     end
 
     # UI
 
     def draw(args)
-      $game.draw.layers[0] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :field }
-      $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }.merge(SPRITE_CURSOR)
-      args.gtk.hide_cursor
-      $game.draw.layers[3] << { x: args.inputs.mouse.x - GRID_SIZE / 2, y: args.inputs.mouse.y - GRID_SIZE / 2 }.merge(SPRITE_MOUSE_CURSOR)
-      $game.draw.layers[1] << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :new_tiles, primitive_marker: :sprite } if @new_tiles
       debug(args)
+
+      $game.draw.layers[0] << { x: 0, y: 0, w: 1280, h: 720, path: :field }
+      $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }
+                              .merge(SPRITE_CURSOR)
+      $game.draw.layers[3] << { x: @mouse.x - GRID_SIZE / 2,
+                                y: @mouse.y - GRID_SIZE / 2 }
+                              .merge(SPRITE_MOUSE_CURSOR)
+      return unless @new_tiles
+
+      $game.draw.layers[1] << { x: 0, y: 0, w: 1280, h: 720, path: :new_tiles,
+                                primitive_marker: :sprite }
     end
 
     # Debug
 
     def debug_once(args)
-      debug = []
+      debug = args.outputs[:scene_main_debug].lines
 
       (args.grid.w / GRID_SIZE).map_with_index do |x|
-        debug << { x: x * GRID_SIZE, y: 0, x2: x * GRID_SIZE, y2: args.grid.top, primitive_marker: :line }
+        debug << { x: x * GRID_SIZE, y: 0, x2: x * GRID_SIZE,
+                   y2: args.grid.top, primitive_marker: :line }
       end
       (args.grid.h / GRID_SIZE).map_with_index do |y|
-        debug << { x: 0, y: y * GRID_SIZE, x2: args.grid.right, y2: y * GRID_SIZE, primitive_marker: :line }
+        debug << { x: 0, y: y * GRID_SIZE, x2: args.grid.right,
+                   y2: y * GRID_SIZE, primitive_marker: :line }
       end
-      args.render_target(:scene_main_debug).lines << debug
     end
 
-    def debug(args)
+    def debug(_args)
       return unless $game.do_debug
-      $game.draw.debug_layer << { x: 0, y: 0, w: args.grid.w, h: args.grid.h, path: :scene_main_debug }
-      $game.draw.debug_layer << { x: 0, y: 80, text: "Tile #{@tile_x}, #{@tile_y}", primitive_marker: :label }
+      $game.draw.debug_layer << { x: 0, y: 0, w: 1280, h: 720,
+                                  path: :scene_main_debug }
+      $game.draw.debug_layer << { x: 0, y: 80,
+                                  text: "Tile #{@tile_x}, #{@tile_y}",
+                                  primitive_marker: :label }
     end
   end
 end
