@@ -9,6 +9,15 @@ def keyboard
   $gtk.args.inputs.keyboard
 end
 
+def screenshots(args)
+  return unless args.inputs.keyboard.key_up.single_quotation_mark
+
+  args.outputs.screenshots << {
+    x: 0, y: 0, w: 1280, h: 720, path: 'screenshot.png'
+
+  }
+end
+
 # You can customize the buttons that show up in the Console.
 class GTK::Console::Menu
   # STEP 1: Override the custom_buttons function.

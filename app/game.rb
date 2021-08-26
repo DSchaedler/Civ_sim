@@ -23,6 +23,8 @@ module Civ
       @scene_manager.tick(args)
       @draw.tick(args)
 
+      screenshots(args)
+
       @do_debug = !@do_debug if args.inputs.keyboard.key_up.tab
       debug(args) if @do_debug
 
