@@ -10,9 +10,16 @@ module Civ
       @game_tick = 0
       @scene_manager = Civ::SceneManager.new(args)
       @draw = Civ::Draw.new(args)
+      @once_done = false
+    end
+
+    def once(_args)
+      @once_done = true
     end
 
     def tick(args)
+      once(args) if @once_done == false
+
       @scene_manager.tick(args)
       @draw.tick(args)
 

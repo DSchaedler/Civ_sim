@@ -7,14 +7,14 @@ module Civ
       @scene_tick = 0
       @scenes = {}
 
-      @scenes[:main] = SceneMain.new
-      @curr_scene = @scenes[:main]
       @next_scene = nil
       @once_done = false
     end
 
     def once(_args)
       @once_done = true
+
+      @curr_scene = Civ.scene_main
     end
 
     def tick(args)
@@ -31,3 +31,5 @@ module Civ
     end
   end
 end
+
+Civ.extend Civ

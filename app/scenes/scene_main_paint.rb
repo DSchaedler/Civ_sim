@@ -1,8 +1,6 @@
 module Civ
   # Scene for editing SceneMain
   class SceneMainPaint
-    attr_gtk
-
     TILE_OFFSET = 2
 
     SCALED_SCREEN_WIDTH = (1280 / GRID_SIZE) + TILE_OFFSET
@@ -13,17 +11,13 @@ module Civ
     OFFSET_MARGIN_X = TILE_OFFSET * SCALED_GRID_X
     OFFSET_MARGIN_Y = TILE_OFFSET * SCALED_GRID_Y
 
-    attr_accessor :name
+    attr_accessor :name, :cursor_x, :cursor_y
 
-    def initialize(_args)
+    def initialize
       @name = 'mainPaint'
       @once_done = false
-      @tile_x = 0
-      @tile_y = 0
       @cursor_x = 0
       @cursor_y = 0
-      @map_tile_x = 0
-      @map_tile_y = 0
     end
 
     def once(args)
@@ -33,7 +27,7 @@ module Civ
     end
 
     def tick(args)
-      @main = $game.scene_manager.scenes[:main]
+      @main = Civ.scene_main
       once(args) if @once_done == false
       calc(args)
       draw(args)
@@ -50,12 +44,11 @@ module Civ
 
       return unless args.inputs.keyboard.key_up.p
 
-      $game.scene_manager.next_scene = $game.scene_manager.scenes[:main]
+      $game.scene_manager.next_scene = Civ.scene_main
     end
 
     def draw(args)
       debug(args)
-      args.gtk.hide_cursor
       draw_field(args)
       draw_cursor(args)
       draw_tiles(args) if @main.new_tiles
@@ -67,13 +60,19 @@ module Civ
                                 h: args.grid.h - OFFSET_MARGIN_Y, path: :field }
     end
 
-    def draw_cursor(args)
+    def draw_cursor(_args)
       $game.draw.layers[3] << { x: @tile_x * SCALED_GRID_X,
                                 y: @tile_y * SCALED_GRID_Y }
                               .merge(SPRITE_CURSOR)
-      $game.draw.layers[3] << { x: args.inputs.mouse.x - 8,
-                                y: args.inputs.mouse.y - 8 }
-                              .merge(SPRITE_MOUSE_CURSOR)
+                              .merge(w: SCALED_GRID_X,
+                                     h: SCALED_GRID_Y)
+
+      # args.gtk.hide_cursor
+      # $game.draw.layers[3] << { x: args.inputs.mouse.x - SCALED_GRID_X / 2,
+      #                           y: args.inputs.mouse.y - SCALED_GRID_Y / 2 }
+      #                         .merge(SPRITE_MOUSE_CURSOR)
+      #                         .merge(w: SCALED_GRID_X,
+      #                                h: SCALED_GRID_Y)
     end
 
     def draw_tiles(args)
@@ -98,13 +97,16 @@ module Civ
                                 text: "y: #{@cursor_y}",
                                 primitive_marker: :label }
 
-      @cursor_x += 1 if args.inputs.keyboard.key_up.right
-      @cursor_x -= 1 if args.inputs.keyboard.key_up.left
-      @cursor_y += 1 if args.inputs.keyboard.key_up.up
-      @cursor_y -= 1 if args.inputs.keyboard.key_up.down
+      @cursor_x += 1 if keyboard.key_up.right
+      @cursor_x -= 1 if keyboard.key_up.left
+      @cursor_y += 1 if keyboard.key_up.up
+      @cursor_y -= 1 if keyboard.key_up.down
 
-      return unless @map_tile_x >= 0
-      return unless @map_tile_y >= 0
+      if @tile_x.zero? && @tile_y == 19 && args.inputs.mouse.up
+        $game.scene_manager.next_scene = Civ.scene_main_paint_pick
+      end
+
+      return unless @map_tile_x >= 0 && @map_tile_y >= 0
       @main.layer2[@map_tile_x] ||= []
       left_click(args) if args.inputs.mouse.button_left
       right_click(args) if args.inputs.mouse.button_right
@@ -166,3 +168,5 @@ module Civ
     end
   end
 end
+
+Civ.extend Civ

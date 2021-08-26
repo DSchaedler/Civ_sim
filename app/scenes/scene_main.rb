@@ -24,8 +24,6 @@ module Civ
         end
       end
 
-      $game.scene_manager.scenes[:mainPaint] ||= SceneMainPaint.new(args)
-
       $game.draw.layers = [[], [], [], []]
 
       @once_done = true
@@ -35,8 +33,6 @@ module Civ
 
     def tick(args)
       once(args) if @once_done == false
-
-      args.gtk.hide_cursor
 
       mouse_move(args)
 
@@ -48,9 +44,7 @@ module Civ
       @tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
       @tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
 
-      return unless args.inputs.keyboard.key_up.p
-
-      $game.scene_manager.next_scene = $game.scene_manager.scenes[:mainPaint]
+      $game.scene_manager.next_scene = Civ.scene_main_paint if keyboard.key_up.p
     end
 
     def mouse_move(args)
@@ -68,9 +62,11 @@ module Civ
       $game.draw.layers[0] << { x: 0, y: 0, w: 1280, h: 720, path: :field }
       $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }
                               .merge(SPRITE_CURSOR)
-      $game.draw.layers[3] << { x: @mouse.x - GRID_SIZE / 2,
-                                y: @mouse.y - GRID_SIZE / 2 }
-                              .merge(SPRITE_MOUSE_CURSOR)
+
+      # args.gtk.hide_cursor
+      # $game.draw.layers[3] << { x: @mouse.x - GRID_SIZE / 2,
+      #                           y: @mouse.y - GRID_SIZE / 2 }
+      #                         .merge(SPRITE_MOUSE_CURSOR)
       return unless @new_tiles
 
       $game.draw.layers[1] << { x: 0, y: 0, w: 1280, h: 720, path: :new_tiles,
@@ -102,3 +98,5 @@ module Civ
     end
   end
 end
+
+Civ.extend Civ

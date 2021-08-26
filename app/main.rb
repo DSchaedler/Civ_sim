@@ -7,7 +7,3 @@ def tick(args)
   $game ||= Civ::Game.new(args) # Create an instance of the game class
   $game.tick(args) # Tick the game, passing args
 end
-
-def reset_game
-  $game = nil
-end
