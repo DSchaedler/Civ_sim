@@ -11,4 +11,7 @@ require 'app/scenes/scene_main.rb'
 require 'app/scenes/scene_main_paint.rb'
 require 'app/scenes/scene_main_paint_pick.rb'
 
+require 'app/objects/object_base_object.rb'
+require 'app/objects/object_player.rb'
+
 # require 'app/utils/nine_tile.rb'

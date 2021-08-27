@@ -24,9 +24,11 @@ module Civ
         end
       end
 
-      $game.draw.layers = [[], [], [], []]
+      $game.draw.layers = [[], [], [], [], []]
 
       @once_done = true
+
+      @player = Object_Player.new
     end
 
     # Main Loop
@@ -44,6 +46,8 @@ module Civ
       @tile_x = (args.inputs.mouse.x / GRID_SIZE).floor
       @tile_y = (args.inputs.mouse.y / GRID_SIZE).floor
 
+      @player.tick
+
       $game.scene_manager.next_scene = Civ.scene_main_paint if keyboard.key_up.p
     end
 
@@ -60,17 +64,13 @@ module Civ
       debug(args)
 
       $game.draw.layers[0] << { x: 0, y: 0, w: 1280, h: 720, path: :field }
-      $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }
-                              .merge(SPRITE_CURSOR)
-
-      # args.gtk.hide_cursor
-      # $game.draw.layers[3] << { x: @mouse.x - GRID_SIZE / 2,
-      #                           y: @mouse.y - GRID_SIZE / 2 }
-      #                         .merge(SPRITE_MOUSE_CURSOR)
-      return unless @new_tiles
-
-      $game.draw.layers[1] << { x: 0, y: 0, w: 1280, h: 720, path: :new_tiles,
-                                primitive_marker: :sprite }
+      # $game.draw.layers[3] << { x: @tile_x * GRID_SIZE, y: @tile_y * GRID_SIZE }
+      #                        .merge(SPRITE_CURSOR)
+      #
+      # return unless @new_tiles
+      #
+      # $game.draw.layers[1] << { x: 0, y: 0, w: 1280, h: 720, path: :new_tiles,
+      #                          primitive_marker: :sprite }
     end
 
     # Debug

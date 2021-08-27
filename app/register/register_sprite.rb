@@ -47,3 +47,14 @@ SPRITE_MOUSE_CURSOR = {
   path: 'app/sprites/mouse_cursor.png',
   primitive_marker: :sprite
 }.freeze
+
+SPRITE_PLAYER = {
+  w: GRID_SIZE,
+  h: GRID_SIZE,
+  path: 'app/sprites/char_sheet.png',
+  source_x: 0,
+  source_y: 0,
+  source_w: 32,
+  source_h: 32,
+  primitive_marker: :sprite
+}.freeze
