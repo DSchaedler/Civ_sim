@@ -48,13 +48,32 @@ SPRITE_MOUSE_CURSOR = {
   primitive_marker: :sprite
 }.freeze
 
-SPRITE_PLAYER = {
+SPRITE_PLAYER_BASE = {
   w: GRID_SIZE,
   h: GRID_SIZE,
   path: 'app/sprites/char_sheet.png',
-  source_x: 0,
-  source_y: 0,
   source_w: 32,
   source_h: 32,
   primitive_marker: :sprite
 }.freeze
+
+SPRITE_PLAYER_F = {
+  source_x: 0,
+  source_y: 0
+}.merge(SPRITE_PLAYER_BASE)
+
+SPRITE_PLAYER_B = {
+  source_x: 5 * 32,
+  source_y: 0
+}.merge(SPRITE_PLAYER_BASE)
+
+SPRITE_PLAYER_L = {
+  source_x: 3 * 32,
+  source_y: 0
+}.merge(SPRITE_PLAYER_BASE)
+
+SPRITE_PLAYER_R = {
+  source_x: 3 * 32,
+  source_y: 0,
+  flip_horizontally: true,
+}.merge(SPRITE_PLAYER_BASE)
